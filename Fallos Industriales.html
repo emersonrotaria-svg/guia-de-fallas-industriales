@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía de Tipos de Fallas Industriales</title>
+    <style>
+        /* --- ESTILOS GENERALES (CSS) --- */
+        body {
+            font-family: -apple-system, BlinkMacMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* --- CONTENEDOR PRINCIPAL --- */
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        /* --- ENCABEZADO --- */
+        header {
+            background-color: #004a7f;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+
+        /* --- SECCIÓN DE FALLAS --- */
+        .falla-item {
+            border-bottom: 1px solid #e0e0e0;
+            transition: all 0.3s ease; 
+        }
+        .falla-item:last-child {
+            border-bottom: none;
+        }
+
+        /* --- CABECERA DE CADA FALLA (CLICKABLE) --- */
+        .falla-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border-left: 5px solid transparent; 
+        }
+        .falla-header:hover {
+            background-color: #f9f9f9;
+        }
+        .falla-header img {
+            width: 40px;
+            height: 40px;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+        .falla-header h2 {
+            margin: 0;
+            font-size: 1.25em;
+            color: #005691;
+            margin-right: auto;
+        }
+        
+        .falla-header .riesgo-texto {
+            font-weight: bold;
+            font-size: 0.9em;
+            padding: 5px 10px;
+            border-radius: 15px;
+            margin-right: 15px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        
+        .falla-header .arrow {
+            font-size: 1.5em;
+            transition: transform 0.3s ease;
+        }
+        
+        /* --- COLORES PARA EL NIVEL DE RIESGO --- */
+        .riesgo-texto[data-riesgo="grave"] { background-color: #ffcdd2; color: #c62828; }
+        .riesgo-texto[data-riesgo="medio"] { background-color: #ffd966; color: #8a6d00; } 
+        .riesgo-texto[data-riesgo="bajo"] { background-color: #c8e6c9; color: #2e7d32; }
+
+        /* --- ILUMINACIÓN DE LA BARRA AL HACER CLICK --- */
+        .falla-item.active .falla-header[data-riesgo="grave"] { background-color: #ffcdd2; border-left-color: #e53935; }
+        .falla-item.active .falla-header[data-riesgo="medio"] { background-color: #ffecb3; border-left-color: #ffd966; } 
+        .falla-item.active .falla-header[data-riesgo="bajo"] { background-color: #c8e6c9; border-left-color: #43a047; }
+        
+        .falla-item.active .falla-header .riesgo-texto {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* --- ESTILO PARA LA SECCIÓN ACTIVA COMPLETA --- */
+        .falla-item.active {
+            border: 1px solid #ccc; 
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1); 
+            margin: 8px 0;
+            border-radius: 8px;
+            /* Asegura que el borde inferior no se superponga si hay otros activos */
+            border-bottom: 1px solid #ccc; 
+        }
+        /* Eliminar borde inferior del .falla-item cuando está activo, para que el borde del propio item lo defina */
+        .falla-item.active:last-child {
+            border-bottom: 1px solid #ccc;
+        }
+
+
+        /* --- CONTENIDO DESPLEGABLE --- */
+        .falla-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, padding 0.5s ease-out;
+            background-color: #fafafa; /* Fondo por defecto del contenido */
+            padding: 0 20px;
+            border-bottom-left-radius: 8px; /* Redondeo para que coincida con el borde del .falla-item */
+            border-bottom-right-radius: 8px;
+        }
+
+        /* --- AJUSTE CLAVE: FONDO MÁS OSCURO AL CONTENIDO ACTIVO --- */
+        .falla-item.active .falla-content {
+            background-color: #e9ecef; /* Tono grisáceo más oscuro */
+        }
+        
+        .falla-descripcion {
+            padding-bottom: 15px;
+        }
+        .falla-descripcion h4 {
+            font-size: 1.1em;
+            color: #004a7f;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+        .falla-descripcion p, .falla-descripcion ul {
+            margin: 0;
+            padding-left: 20px;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+        .falla-descripcion > p {
+            padding-left: 0;
+        }
+        .falla-descripcion li {
+            margin-bottom: 5px;
+        }
+
+
+        /* --- SUBMENÚ DENTRO DEL DESPLEGABLE --- */
+        .submenu {
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+        .submenu-item {
+            margin-bottom: 15px;
+        }
+        .submenu-item h3 {
+            font-size: 1em;
+            color: #333;
+            background-color: #dcdfe4; /* Ajustado para que el fondo del H3 del submenu también contraste */
+            padding: 10px;
+            border-radius: 5px;
+            margin: 0 0 8px 0;
+        }
+        .submenu-item p, .submenu-item ul {
+            font-size: 0.95em;
+            line-height: 1.6;
+            margin: 0;
+            padding-left: 20px;
+        }
+        .submenu-item li {
+            margin-bottom: 5px;
+        }
+        
+        /* --- ESTADO ACTIVO (CUANDO SE ABRE) --- */
+        .falla-item.active .falla-header .arrow {
+            transform: rotate(90deg);
+        }
+        .falla-item.active .falla-content {
+            padding: 20px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Guía Interactiva de Fallas Industriales</h1>
+        </header>
+
+        <main id="fallas-container">
+            </main>
+    </div>
+
+    <script>
+    // --- LÓGICA DE LA PÁGINA (JAVASCRIPT) ---
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // --- BASE DE DATOS COMPLETA DE FALLAS ---
+        const fallasData = [
+            {
+                titulo: "Fallas Mecánicas",
+                icono: "https://img.icons8.com/ios/50/000000/gear.png",
+                descripcion: "Relacionadas con equipos, maquinaria y componentes físicos.",
+                ejemplos: ["Rotura de componentes críticos (bombas, válvulas, ejes, turbinas).", "Desgaste acelerado por falta de mantenimiento.", "Fatiga estructural o fracturas en materiales."],
+                causas: ["Diseño deficiente.", "Sobrecarga operativa.", "Corrosión o fatiga por ciclos térmicos.", "Mantenimiento inadecuado."],
+                nivel_riesgo: "Medio ⚠️",
+                riesgo_key: "medio",
+                submenu: {
+                    consecuencias_humanas: "Lesiones, amputaciones, muertes por maquinaria descontrolada.",
+                    consecuencias_socioeconomicas: "Pérdidas por paradas, demandas laborales.",
+                    controles_propuestos: ["Mantenimiento preventivo y predictivo.", "Inspecciones de integridad estructural.", "Protocolos LOTO (Lock Out Tag Out).", "Capacitación en operación segura."],
+                    responsable: "Área de Mantenimiento y HSE"
+                }
+            },
+            {
+                titulo: "Fallas Eléctricas y Electrónicas",
+                icono: "https://img.icons8.com/ios/50/000000/electrical.png",
+                descripcion: "Impactan sistemas de control, potencia y automatización.",
+                ejemplos: ["Cortocircuitos y arcos eléctricos.", "Sobretensiones y picos eléctricos.", "Fallo de sensores críticos.", "Colapso de sistemas SCADA o PLCs."],
+                causas: ["Descargas atmosféricas (rayos).", "Instalaciones defectuosas.", "Sobrecargas no controladas.", "Falta de redundancia."],
+                nivel_riesgo: "Medio ⚠️",
+                riesgo_key: "medio",
+                submenu: {
+                    consecuencias_humanas: "Electrocuciones, quemaduras graves, incendios.",
+                    consecuencias_socioeconomicas: "Paradas totales, afectación a redes públicas.",
+                    controles_propuestos: ["Sistemas de protección (breakers, pararrayos).", "Inspección de cableado y equipos.", "Programa de trabajo seguro en electricidad.", "Sistema redundante de respaldo energético."],
+                    responsable: "Ingeniería Eléctrica, HSE, Operaciones"
+                }
+            },
+            {
+                titulo: "Fallas de Procesos Químicos",
+                icono: "https://img.icons8.com/ios/50/000000/laboratory.png",
+                descripcion: "Relacionadas con reacciones descontroladas o pérdida de control operacional.",
+                ejemplos: ["Reacciones exotérmicas fuera de control.", "Mezclas incompatibles que generan explosiones.", "Pérdida de contención de sustancias tóxicas.", "Fugas de gases inflamables."],
+                causas: ["Error humano en dosificación.", "Fallo de válvulas de alivio.", "Falta de monitoreo de variables críticas.", "No seguir protocolos de seguridad."],
+                nivel_riesgo: "Grave 🔴",
+                riesgo_key: "grave",
+                submenu: {
+                    consecuencias_humanas: "Intoxicaciones masivas, muertes, afectaciones prolongadas en comunidades.",
+                    consecuencias_socioeconomicas: "Daños irreversibles a ecosistemas, pérdidas millonarias, cierre de planta.",
+                    controles_propuestos: ["Sistemas de contención primaria y secundaria.", "Alarmas de fuga y monitoreo de variables críticas.", "Válvulas de seguridad y alivio.", "Cultura de seguridad de procesos (PSM)."],
+                    responsable: "Producción, HSE, Gerencia de Planta"
+                }
+            },
+            {
+                titulo: "Fallas Estructurales",
+                icono: "https://img.icons8.com/ios/50/000000/structural.png",
+                descripcion: "Comprometen edificaciones, puentes industriales o tanques de almacenamiento.",
+                ejemplos: ["Colapso de techos en plantas industriales.", "Ruptura de presas o diques.", "Fallas en tanques de almacenamiento masivo.", "Colapso de torres o chimeneas."],
+                causas: ["Diseño deficiente ante cargas sísmicas o de viento.", "Corrosión severa no detectada.", "Sobrecarga de peso o vibraciones continuas.", "Daños por fenómenos naturales."],
+                nivel_riesgo: "Grave 🔴",
+                riesgo_key: "grave",
+                submenu: {
+                    consecuencias_humanas: "Muertes masivas, lesiones graves, colapso total de instalaciones.",
+                    consecuencias_socioeconomicas: "Reconstrucción costosa, crisis reputacional.",
+                    controles_propuestos: ["Estudios geotécnicos y estructurales.", "Mantenimiento de edificaciones.", "Simulacros de evacuación.", "Certificación de cargas máximas."],
+                    responsable: "Ingeniería Civil, HSE, Gerencia de Infraestructura"
+                }
+            },
+            {
+                titulo: "Fallas Humanas (Factor Humano)",
+                icono: "https://img.icons8.com/ios/50/000000/user-male-circle.png",
+                descripcion: "Errores de operación o toma de decisiones inadecuadas.",
+                ejemplos: ["Activación incorrecta de equipos.", "Saltarse procedimientos de seguridad.", "Fatiga laboral que afecta la atención.", "Falta de capacitación en manejo de crisis."],
+                causas: ["Sobrecarga de trabajo.", "Deficiente cultura de seguridad.", "Comunicación ineficiente entre áreas.", "Falta de supervisión."],
+                nivel_riesgo: "Medio ⚠️",
+                riesgo_key: "medio",
+                submenu: {
+                    consecuencias_humanas: "Accidentes operativos, estrés laboral, fatiga.",
+                    consecuencias_socioeconomicas: "Pérdidas por errores, sanciones legales.",
+                    controles_propuestos: ["Programas de capacitación continua.", "Cultura de reporte de incidentes (Near Miss).", "Controles de fatiga y ergonomía.", "Protocolos estandarizados (SOP)."],
+                    responsable: "Talento Humano, HSE, Supervisores"
+                }
+            },
+            {
+                titulo: "Fallas Organizacionales y de Gestión",
+                icono: "https://img.icons8.com/ios/50/000000/organization.png",
+                descripcion: "Deficiencias en la administración de la operación industrial.",
+                ejemplos: ["Ausencia de planes de mantenimiento preventivo.", "Falta de planes de respuesta ante emergencias.", "Escasa inversión en seguridad industrial."],
+                causas: ["Liderazgo deficiente.", "Falta de presupuesto para seguridad.", "Priorización excesiva de la productividad sobre la seguridad."],
+                nivel_riesgo: "Grave 🔴",
+                riesgo_key: "grave",
+                submenu: {
+                    consecuencias_humanas: "Respuesta lenta ante emergencias → mayor mortalidad.",
+                    consecuencias_socioeconomicas: "Crisis de reputación, multas, pérdida de contratos.",
+                    controles_propuestos: ["Sistema de gestión integral (ISO).", "Auditorías internas y externas.", "Comité de crisis y continuidad de negocio.", "Programas de liderazgo en seguridad."],
+                    responsable: "Alta Dirección, Auditoría Interna"
+                }
+            },
+            {
+                titulo: "Fallas de Instrumentación y Control",
+                icono: "https://img.icons8.com/ios/50/000000/control-panel.png",
+                descripcion: "Sistemas automáticos que no detectan condiciones peligrosas.",
+                ejemplos: ["Alarmas que no se activan a tiempo.", "Fallo de sensores de temperatura o presión.", "Pérdida de comunicación en sistemas digitales.", "Errores de software en sistemas críticos."],
+                causas: ["Configuración incorrecta.", "Falta de redundancia.", "Obsolescencia tecnológica.", "Ataques cibernéticos."],
+                nivel_riesgo: "Medio ⚠️",
+                riesgo_key: "medio",
+                submenu: {
+                    consecuencias_humanas: "Explosiones o fugas por alarmas que no se activan.",
+                    consecuencias_socioeconomicas: "Productos defectuosos, retiro masivo del mercado.",
+                    controles_propuestos: ["Redundancia de sensores críticos.", "Pruebas periódicas de alarmas y sistemas SCADA.", "Calibración y mantenimiento.", "Mantenimiento predictivo digital."],
+                    responsable: "Ingeniería de Control, HSE, Producción"
+                }
+            },
+            {
+                titulo: "Fallas de Logística y Cadena de Suministro",
+                icono: "https://img.icons8.com/ios/50/000000/container-truck.png",
+                descripcion: "Riesgos relacionados con transporte y almacenamiento de materiales.",
+                ejemplos: ["Derrames durante transporte.", "Explosiones en centros de almacenamiento.", "Accidentes con materiales peligrosos."],
+                causas: ["Capacitación deficiente de transportistas.", "Infraestructura inadecuada.", "Procedimientos ineficientes."],
+                nivel_riesgo: "Medio ⚠️",
+                riesgo_key: "medio",
+                submenu: {
+                    consecuencias_humanas: "Muertes en accidentes viales, intoxicaciones por derrames.",
+                    consecuencias_socioeconomicas: "Paralización de la operación, costos legales.",
+                    controles_propuestos: ["Certificación en transporte de mercancías peligrosas.", "Protocolos de carga y descarga seguros.", "Auditoría a proveedores críticos.", "Seguros especializados."],
+                    responsable: "Logística, HSE, Compras"
+                }
+            },
+            {
+                titulo: "Fallas Externas o Naturales",
+                icono: "https://img.icons8.com/ios/50/storm.png",
+                descripcion: "Eventos fuera del control directo de la empresa.",
+                ejemplos: ["Sismos que afectan estructuras.", "Inundaciones en zonas industriales.", "Tormentas eléctricas que impactan la energía."],
+                causas: ["Ubicación geográfica en zonas de riesgo.", "Planificación territorial deficiente.", "Falta de planes de contingencia."],
+                nivel_riesgo: "Medio ⚠️",
+                riesgo_key: "medio",
+                submenu: {
+                    consecuencias_humanas: "Muertes directas por fenómenos naturales.",
+                    consecuencias_socioeconomicas: "Daños a infraestructura y comunidad.",
+                    controles_propuestos: ["Planes de contingencia por tipo de fenómeno.", "Mapas de riesgo geográfico.", "Sistemas de alerta temprana.", "Infraestructura resiliente."],
+                    responsable: "HSE, Defensa Civil, Gerencia de Planta"
+                }
+            },
+            {
+                titulo: "Fallas por Ciberseguridad Industrial",
+                icono: "https://img.icons8.com/ios/50/000000/cyber-security.png",
+                descripcion: "Amenazas digitales que afectan operaciones industriales.",
+                ejemplos: ["Hackeo a sistemas SCADA.", "Secuestro de datos (ransomware).", "Manipulación de parámetros críticos de producción."],
+                causas: ["Falta de protocolos de ciberseguridad.", "Equipos con software desactualizado.", "Conexiones inseguras con la red corporativa."],
+                nivel_riesgo: "Medio ⚠️",
+                riesgo_key: "medio",
+                submenu: {
+                    consecuencias_humanas: "Evacuaciones caóticas si alarmas son manipuladas.",
+                    consecuencias_socioeconomicas: "Paralización total de procesos, robo de datos estratégicos.",
+                    controles_propuestos: ["Sistemas de seguridad OT y TI.", "Protocolos de acceso restringido.", "Simulacros de ciberataques.", "Actualización periódica de software y firewalls."],
+                    responsable: "Seguridad Informática, Operaciones"
+                }
+            },
+            {
+                titulo: "Fallas NATECH",
+                icono: "https://img.icons8.com/ios/50/000000/tsunami.png",
+                descripcion: "Fallas industriales originadas por desastres naturales que afectan instalaciones, generando emergencias tecnológicas.",
+                ejemplos: ["Terremoto → Fuga química.", "Inundación → Explosión.", "Huracán → Derrame de petróleo."],
+                causas: ["Instalaciones en zonas de riesgo natural.", "Ausencia de planes de contingencia.", "Sistemas de seguridad no diseñados para condiciones extremas."],
+                nivel_riesgo: "Grave 🔴",
+                riesgo_key: "grave",
+                submenu: {
+                    consecuencias_humanas: "Muertes masivas, desplazamientos forzados, traumas psicológicos.",
+                    consecuencias_socioeconomicas: "Efecto dominó en economía regional, costos billonarios.",
+                    controles_propuestos: ["Planificación territorial segura.", "Diseño industrial resiliente.", "Simulacros integrados (natural + industrial).", "Seguros catastróficos."],
+                    responsable: "Alta Dirección, HSE, Gobierno Local y Nacional"
+                }
+            }
+        ];
+
+        const container = document.getElementById('fallas-container');
+
+        // --- FUNCIÓN PARA CREAR CADA ELEMENTO DE FALLA ---
+        fallasData.forEach(data => {
+            const item = document.createElement('div');
+            item.className = 'falla-item';
+
+            const ejemplosHtml = data.ejemplos.map(e => `<li>${e}</li>`).join('');
+            const causasHtml = data.causas.map(c => `<li>${c}</li>`).join('');
+            const controlesHtml = Array.isArray(data.submenu.controles_propuestos) 
+                ? data.submenu.controles_propuestos.map(c => `<li>${c}</li>`).join('') 
+                : `<li>${data.submenu.controles_propuestos}</li>`;
+
+            item.innerHTML = `
+                <div class="falla-header" data-riesgo="${data.riesgo_key}">
+                    <img src="${data.icono}" alt="Ícono de ${data.titulo}">
+                    <h2>${data.titulo}</h2>
+                    <span class="riesgo-texto" data-riesgo="${data.riesgo_key}">${data.nivel_riesgo}</span>
+                    <span class="arrow">▶</span>
+                </div>
+                <div class="falla-content">
+                    <div class="falla-descripcion">
+                        <p>${data.descripcion}</p>
+                        <h4>Ejemplos Comunes</h4>
+                        <ul>${ejemplosHtml}</ul>
+                        <h4>Causas Frecuentes</h4>
+                        <ul>${causasHtml}</ul>
+                    </div>
+                    <div class="submenu">
+                        <div class="submenu-item">
+                            <h3>Consecuencias Humanas</h3>
+                            <p>${data.submenu.consecuencias_humanas}</p>
+                        </div>
+                        <div class="submenu-item">
+                            <h3>Consecuencias Socioeconómicas</h3>
+                            <p>${data.submenu.consecuencias_socioeconomicas}</p>
+                        </div>
+                        <div class="submenu-item">
+                            <h3>Controles Propuestos</h3>
+                            <ul>${controlesHtml}</ul>
+                        </div>
+                        <div class="submenu-item">
+                            <h3>Responsable</h3>
+                            <p>${data.submenu.responsable}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(item);
+        });
+
+        // --- LÓGICA PARA EL ACORDEÓN (DESPLEGAR) ---
+        container.addEventListener('click', function(e) {
+            const header = e.target.closest('.falla-header');
+            if (!header) return;
+
+            const currentItem = header.parentElement;
+            
+            const wasActive = currentItem.classList.contains('active');
+
+            // Cerrar todos los items
+            document.querySelectorAll('.falla-item').forEach(item => {
+                item.classList.remove('active');
+                item.querySelector('.falla-content').style.maxHeight = '0';
+            });
+
+            // Abrir o cerrar el item actual (si no estaba activo, lo activa)
+            if (!wasActive) {
+                currentItem.classList.add('active');
+                const content = currentItem.querySelector('.falla-content');
+                content.style.maxHeight = content.scrollHeight + "px";
+            }
+        });
+    });
+    </script>
+</body>
+</html>
