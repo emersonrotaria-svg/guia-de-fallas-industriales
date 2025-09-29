@@ -5,16 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Guía de Tipos de Fallas Industriales</title>
     <style>
-        /* --- ESTILOS GENERALES (CSS) --- */
         body {
-            font-family: -apple-system, BlinkMacMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: #f0f2f5;
             color: #333;
             margin: 0;
             padding: 20px;
         }
-
-        /* --- CONTENEDOR PRINCIPAL --- */
         .container {
             max-width: 900px;
             margin: auto;
@@ -23,8 +20,6 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
             overflow: hidden;
         }
-
-        /* --- ENCABEZADO --- */
         header {
             background-color: #004a7f;
             color: white;
@@ -35,8 +30,6 @@
             margin: 0;
             font-size: 2em;
         }
-
-        /* --- SECCIÓN DE FALLAS --- */
         .falla-item {
             border-bottom: 1px solid #e0e0e0;
             transition: all 0.3s ease; 
@@ -44,8 +37,6 @@
         .falla-item:last-child {
             border-bottom: none;
         }
-
-        /* --- CABECERA DE CADA FALLA (CLICKABLE) --- */
         .falla-header {
             display: flex;
             align-items: center;
@@ -69,7 +60,6 @@
             color: #005691;
             margin-right: auto;
         }
-        
         .falla-header .riesgo-texto {
             font-weight: bold;
             font-size: 0.9em;
@@ -81,58 +71,42 @@
             visibility: hidden;
             transition: opacity 0.3s ease, visibility 0.3s ease;
         }
-        
         .falla-header .arrow {
             font-size: 1.5em;
             transition: transform 0.3s ease;
         }
-        
-        /* --- COLORES PARA EL NIVEL DE RIESGO --- */
         .riesgo-texto[data-riesgo="grave"] { background-color: #ffcdd2; color: #c62828; }
         .riesgo-texto[data-riesgo="medio"] { background-color: #ffd966; color: #8a6d00; } 
         .riesgo-texto[data-riesgo="bajo"] { background-color: #c8e6c9; color: #2e7d32; }
-
-        /* --- ILUMINACIÓN DE LA BARRA AL HACER CLICK --- */
         .falla-item.active .falla-header[data-riesgo="grave"] { background-color: #ffcdd2; border-left-color: #e53935; }
         .falla-item.active .falla-header[data-riesgo="medio"] { background-color: #ffecb3; border-left-color: #ffd966; } 
         .falla-item.active .falla-header[data-riesgo="bajo"] { background-color: #c8e6c9; border-left-color: #43a047; }
-        
         .falla-item.active .falla-header .riesgo-texto {
             opacity: 1;
             visibility: visible;
         }
-
-        /* --- ESTILO PARA LA SECCIÓN ACTIVA COMPLETA --- */
         .falla-item.active {
             border: 1px solid #ccc; 
             box-shadow: 0 6px 12px rgba(0,0,0,0.1); 
             margin: 8px 0;
             border-radius: 8px;
-            /* Asegura que el borde inferior no se superponga si hay otros activos */
             border-bottom: 1px solid #ccc; 
         }
-        /* Eliminar borde inferior del .falla-item cuando está activo, para que el borde del propio item lo defina */
         .falla-item.active:last-child {
             border-bottom: 1px solid #ccc;
         }
-
-
-        /* --- CONTENIDO DESPLEGABLE --- */
         .falla-content {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.5s ease-out, padding 0.5s ease-out;
-            background-color: #fafafa; /* Fondo por defecto del contenido */
+            background-color: #fafafa;
             padding: 0 20px;
-            border-bottom-left-radius: 8px; /* Redondeo para que coincida con el borde del .falla-item */
+            border-bottom-left-radius: 8px;
             border-bottom-right-radius: 8px;
         }
-
-        /* --- AJUSTE CLAVE: FONDO MÁS OSCURO AL CONTENIDO ACTIVO --- */
         .falla-item.active .falla-content {
-            background-color: #e9ecef; /* Tono grisáceo más oscuro */
+            background-color: #e9ecef;
         }
-        
         .falla-descripcion {
             padding-bottom: 15px;
         }
@@ -154,9 +128,6 @@
         .falla-descripcion li {
             margin-bottom: 5px;
         }
-
-
-        /* --- SUBMENÚ DENTRO DEL DESPLEGABLE --- */
         .submenu {
             padding-top: 15px;
             border-top: 1px solid #ddd;
@@ -167,7 +138,7 @@
         .submenu-item h3 {
             font-size: 1em;
             color: #333;
-            background-color: #dcdfe4; /* Ajustado para que el fondo del H3 del submenu también contraste */
+            background-color: #dcdfe4;
             padding: 10px;
             border-radius: 5px;
             margin: 0 0 8px 0;
@@ -181,15 +152,12 @@
         .submenu-item li {
             margin-bottom: 5px;
         }
-        
-        /* --- ESTADO ACTIVO (CUANDO SE ABRE) --- */
         .falla-item.active .falla-header .arrow {
             transform: rotate(90deg);
         }
         .falla-item.active .falla-content {
             padding: 20px;
         }
-
     </style>
 </head>
 <body>
@@ -198,16 +166,11 @@
         <header>
             <h1>Guía Interactiva de Fallas Industriales</h1>
         </header>
-
-        <main id="fallas-container">
-            </main>
+        <main id="fallas-container"></main>
     </div>
 
     <script>
-    // --- LÓGICA DE LA PÁGINA (JAVASCRIPT) ---
     document.addEventListener('DOMContentLoaded', function () {
-
-        // --- BASE DE DATOS COMPLETA DE FALLAS ---
         const fallasData = [
             {
                 titulo: "Fallas Mecánicas",
@@ -375,20 +338,15 @@
                 }
             }
         ];
-
         const container = document.getElementById('fallas-container');
-
-        // --- FUNCIÓN PARA CREAR CADA ELEMENTO DE FALLA ---
         fallasData.forEach(data => {
             const item = document.createElement('div');
             item.className = 'falla-item';
-
             const ejemplosHtml = data.ejemplos.map(e => `<li>${e}</li>`).join('');
             const causasHtml = data.causas.map(c => `<li>${c}</li>`).join('');
             const controlesHtml = Array.isArray(data.submenu.controles_propuestos) 
                 ? data.submenu.controles_propuestos.map(c => `<li>${c}</li>`).join('') 
                 : `<li>${data.submenu.controles_propuestos}</li>`;
-
             item.innerHTML = `
                 <div class="falla-header" data-riesgo="${data.riesgo_key}">
                     <img src="${data.icono}" alt="Ícono de ${data.titulo}">
@@ -426,23 +384,15 @@
             `;
             container.appendChild(item);
         });
-
-        // --- LÓGICA PARA EL ACORDEÓN (DESPLEGAR) ---
         container.addEventListener('click', function(e) {
             const header = e.target.closest('.falla-header');
             if (!header) return;
-
             const currentItem = header.parentElement;
-            
             const wasActive = currentItem.classList.contains('active');
-
-            // Cerrar todos los items
             document.querySelectorAll('.falla-item').forEach(item => {
                 item.classList.remove('active');
                 item.querySelector('.falla-content').style.maxHeight = '0';
             });
-
-            // Abrir o cerrar el item actual (si no estaba activo, lo activa)
             if (!wasActive) {
                 currentItem.classList.add('active');
                 const content = currentItem.querySelector('.falla-content');
@@ -452,4 +402,4 @@
     });
     </script>
 </body>
-</html>
+</html>         
